@@ -14,7 +14,11 @@ namespace Engine {
 
 		bool Initialize();
 
+		void OnCreate(HWND hwnd);
+
 		void Update();
+
+		void OnDestroy();
 
 		inline bool IsRunning() { return mIsRunning; } //return flag
 

@@ -12,10 +12,30 @@ namespace Engine {
 		{
 
 		case WM_NCCREATE: {
-			std::cout << "Created a window" << std::endl;
+			LPCREATESTRUCT param = reinterpret_cast<LPCREATESTRUCT>(lparam);
+			Application* pointer = reinterpret_cast<Application*>(param->lpCreateParams);
+
+			SetWindowLongPtr(hwnd, GWLP_USERDATA, reinterpret_cast<LONG_PTR>(pointer));
+			std::cout << "Send create message" << std::endl;
 
 			break;
 			}
+
+		case WM_CREATE: {
+
+			Application* pointer = reinterpret_cast<Application*>(GetWindowLongPtr(hwnd, GWLP_USERDATA));
+
+			pointer->OnCreate(hwnd);
+
+			break;
+		}
+
+		case WM_DESTROY: { //User pressed the Close/Exit Button
+			Application* pointer = reinterpret_cast<Application*>(GetWindowLongPtr(hwnd, GWLP_USERDATA));
+			pointer->OnDestroy(); //Call OnDestroy
+			PostQuitMessage(0); //Exit message with no errors
+			break;
+		}
 		}
 
 		return DefWindowProc(hwnd, msg, wparam, lparam);
@@ -39,7 +59,7 @@ namespace Engine {
 		RegisterClass(&wndClass); //Register the class with a refrence to the class
 
 		//cant use this variable after the function returns; pointer will be assigned but not a correct handle
-		mWindowHandle = CreateWindow(L"BaseWindowClass", L"KOSMO ENGINE WINDOW", WS_OVERLAPPEDWINDOW, 460, 20, 720, 720, 0, 0, 0, 0) ; //Look at the Lparam later
+		mWindowHandle = CreateWindow(L"BaseWindowClass", L"KOSMO ENGINE WINDOW", WS_OVERLAPPEDWINDOW, 460, 20, 720, 720, 0, 0, 0, this) ; //Look at the Lparam later
 
 		if (!mWindowHandle) {
 			return false;
@@ -53,8 +73,36 @@ namespace Engine {
 		return true;
 	}
 
+	void Application::OnCreate(HWND hwnd)
+	{
+		std::cout << "Created the actual window" << std::endl;
+	}
+
 	void Application::Update()
 	{
+		MSG message;
+
+		while (PeekMessage(&message, 0,0,0, PM_REMOVE)) {
+			// Print the message details
+			/*
+			std::cout << "Message: " << message.message << std::endl;
+			std::cout << "HWND: " << message.hwnd << std::endl;
+			std::cout << "WPARAM: " << message.wParam << std::endl;
+			std::cout << "LPARAM: " << message.lParam << std::endl;
+			std::cout << "Time: " << message.time << std::endl;
+			std::cout << "Point: (" << message.pt.x << ", " << message.pt.y << ")" << std::endl;
+			std::cout << "---------------------------------" << std::endl;
+			*/
+			TranslateMessage(&message);
+			DispatchMessage(&message);
+		}
+	}
+
+	void Application::OnDestroy()
+	{
+		std::cout << "Closed the window \nshutting down the application" << std::endl;
+
+		mIsRunning = false;
 	}
 
 }
