@@ -2,11 +2,11 @@
 
 #ifdef ENGINE_EXPORTS
 
-#define YT_API __declspec(dllexport)
+#define KOSMO_API __declspec(dllexport)
 
 #else
 
-#define YT_API __declspec(dllimport)
+#define KOSMO_API __declspec(dllimport)
 
 
 #endif // ENGINE_EXPORTS

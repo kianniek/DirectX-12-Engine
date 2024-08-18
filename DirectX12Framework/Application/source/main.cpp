@@ -10,7 +10,7 @@ int main() {
 		 
 		while (engineApp.IsRunning())
 		{
-
+			engineApp.Update();
 		}
 	}
 }
