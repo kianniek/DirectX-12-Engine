@@ -30,3 +30,6 @@
 *.exe
 *.out
 *.app
+/DirectX12Framework/.vs/DirectX12Framework
+/.vs
+*.sln
