@@ -8,6 +8,22 @@
 #define PCH_H
 
 // add headers that you want to pre-compile here
+#include <iostream>
+
+//D12 headers:
+#include <d3d12.h>
+#include <dxgi1_6.h>
+#include <dxgidebug.h>
+
+//completed lib files for d12
+
+#pragma comment(lib, "dxgi.lib")
+#pragma comment(lib, "D3D12.lib") 
+#pragma comment(lib, "dxguid.lib") 
+
 #include "EngineMin.h"
+#include "Helper.h"
+
+
 
 #endif //PCH_H

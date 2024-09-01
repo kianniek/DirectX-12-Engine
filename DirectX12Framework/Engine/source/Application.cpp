@@ -1,8 +1,8 @@
 #include "pch.h"
 #include "Application.h"
 
-#include <windowsx.h>
-#include <iostream>
+//#include <windowsx.h>
+
 
 namespace Engine {
 
@@ -19,7 +19,7 @@ namespace Engine {
 			std::cout << "Send create message" << std::endl;
 
 			break;
-			}
+		}
 
 		case WM_CREATE: {
 
@@ -47,7 +47,7 @@ namespace Engine {
 		wndClass.lpszClassName = L"BaseWindowClass";
 		wndClass.style = 0;
 		wndClass.hCursor = LoadCursor(NULL, IDC_ARROW);
-		wndClass.hIcon = LoadIcon(NULL, IDI_APPLICATION);
+		wndClass.hIcon = LoadIcon(NULL, IDI_WINLOGO);
 		wndClass.hbrBackground = (HBRUSH)COLOR_WINDOW;
 
 		wndClass.lpszMenuName = 0;
@@ -59,7 +59,19 @@ namespace Engine {
 		RegisterClass(&wndClass); //Register the class with a refrence to the class
 
 		//cant use this variable after the function returns; pointer will be assigned but not a correct handle
-		mWindowHandle = CreateWindow(L"BaseWindowClass", L"KOSMO ENGINE WINDOW", WS_OVERLAPPEDWINDOW, 460, 20, 720, 720, 0, 0, 0, this) ; //Look at the Lparam later
+		mWindowHandle = CreateWindow(
+			L"BaseWindowClass",				//window class name 
+			L"KOSMO ENGINE WINDOW",			//window caption
+			WS_OVERLAPPEDWINDOW,			//window style
+			460,							//initial x position
+			20,								//initial y position
+			720,							//initial x size
+			720, 							//initial y size
+			0, 								//parent window handle
+			0, 								//window menu handle
+			0, 								//initial x position
+			this
+		); //'TODO: Look at the Lparam 
 
 		if (!mWindowHandle) {
 			return false;
@@ -76,13 +88,15 @@ namespace Engine {
 	void Application::OnCreate(HWND hwnd)
 	{
 		std::cout << "Created the actual window" << std::endl;
+		mRenderer.Initialize(hwnd);
+
 	}
 
 	void Application::Update()
 	{
 		MSG message;
 
-		while (PeekMessage(&message, 0,0,0, PM_REMOVE)) {
+		while (PeekMessage(&message, 0, 0, 0, PM_REMOVE)) {
 			// Print the message details
 			/*
 			std::cout << "Message: " << message.message << std::endl;

@@ -1,8 +1,9 @@
 #pragma once
+#include "EngineMin.h"
 
 #include <windows.h>
 
-#include "EngineMin.h"
+#include "./Render API/RenderAPI.h"
 
 namespace Engine {
 	class KOSMO_API Application
@@ -23,7 +24,11 @@ namespace Engine {
 		inline bool IsRunning() { return mIsRunning; } //return flag
 
 
-	private:
+	private: 
+		
+		RenderAPI mRenderer;
+
+	private: //Variables
 		HWND mWindowHandle = nullptr;
 		bool mIsRunning = false; //flag to check if the application is running 
 
