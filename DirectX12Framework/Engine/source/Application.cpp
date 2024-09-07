@@ -1,6 +1,8 @@
 #include "pch.h"
 #include "Application.h"
 
+#include "Render API/DirectX12/Debug/DXGIDebug.h"
+
 //#include <windowsx.h>
 
 
@@ -115,6 +117,8 @@ namespace Engine {
 	void Application::OnDestroy()
 	{
 		std::cout << "Closed the window \nshutting down the application" << std::endl;
+
+		DXGIDebug::Get().GetLiveObjects();
 
 		mIsRunning = false;
 	}

@@ -4,20 +4,26 @@
 #include "DirectX12/DXGI/DXGIFactory.h"
 #include "DirectX12/DXGI/DXGIAdapter.h"
 
+#include "DirectX12/Debug/D12Debug.h"
 
 
 namespace Engine {
 
 	RenderAPI::~RenderAPI()
 	{
-
+		if(mDevice.Get())
+		{
+			mDevice.Reset();
+		}
 	}
 
 	void RenderAPI::Initialize(HWND hwnd)
 	{
+		//TODO: this could be disabled during non-debug builds (should be coupled with the use of the DebugLayer)
+		D12Debug::Get().Enable();
 
+		//Don't need to release these components since it's done for us
 		DXGIFactory factory;
-
 		DXGIAdapter adapter = factory.GetAdapter();
 
 		DXGI_ADAPTER_DESC desc;
