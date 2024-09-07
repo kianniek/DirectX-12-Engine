@@ -11,10 +11,7 @@ namespace Engine {
 
 	RenderAPI::~RenderAPI()
 	{
-		if(mDevice.Get())
-		{
-			mDevice.Reset();
-		}
+		Release();
 	}
 
 	void RenderAPI::Initialize(HWND hwnd)
@@ -34,6 +31,9 @@ namespace Engine {
 		bool hasCreatedDevice = mDevice.Init(adapter.Get());
 
 		mDevice->SetName(L"Main virtual device");
+
+		mCommandQueue.Initialize(mDevice.Get());
+		mCommandList.Initialize(mDevice.Get());	
 
 		if (!hasCreatedDevice) {
 			// Log the error
@@ -63,5 +63,17 @@ namespace Engine {
 		COM SYSTEM
 
 		*/
+	}
+
+	void RenderAPI::Release()
+	{
+		mCommandList.Release();	
+
+		mCommandQueue.Release();
+
+		if (mDevice.Get())
+		{
+			mDevice.Reset();
+		}
 	}
 }
