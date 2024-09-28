@@ -3,7 +3,7 @@
 
 namespace Engine
 {
-	class D12CommandList : public Microsoft::WRL::ComPtr<ID3D12CommandList>
+	class KOSMO_API D12CommandList : public Microsoft::WRL::ComPtr<ID3D12CommandList>
 	{
 	public:
 		D12CommandList() = default;

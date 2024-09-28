@@ -14,8 +14,12 @@ namespace Engine {
 		Release();
 	}
 
-	void RenderAPI::Initialize(HWND hwnd)
+	void RenderAPI::Initialize(HWND hwnd, const UINT width, const UINT height)
 	{
+		mWidth = width;
+		mHeight = height;
+
+
 		//TODO: this could be disabled during non-debug builds (should be coupled with the use of the DebugLayer)
 		D12Debug::Get().Enable();
 
@@ -23,17 +27,21 @@ namespace Engine {
 		DXGIFactory factory;
 		DXGIAdapter adapter = factory.GetAdapter();
 
-		DXGI_ADAPTER_DESC desc;
-		adapter->GetDesc(&desc);
-
-		PRINT_W_N("Selected device " << desc.Description)
+		/*Console Output For Debugging*/
+		{
+			DXGI_ADAPTER_DESC desc;
+			adapter->GetDesc(&desc);
+			PRINT_W_N("Selected device " << desc.Description)
+		}
+		/*End Debugging Output*/
 
 		bool hasCreatedDevice = mDevice.Init(adapter.Get());
-
 		mDevice->SetName(L"Main virtual device");
 
 		mCommandQueue.Initialize(mDevice.Get());
-		mCommandList.Initialize(mDevice.Get());	
+		mCommandList.Initialize(mDevice.Get());
+
+		mSwapChain.Initialize(mDevice.Get(), factory.Get(), mCommandQueue.Get(), hwnd, mWidth, mHeight);
 
 		if (!hasCreatedDevice) {
 			// Log the error
@@ -55,8 +63,6 @@ namespace Engine {
 		// Proceed with other D12 calls only if the device was successfully created
 		// Your other D12 initialization or rendering code here
 
-
-
 		/*
 		ACCESS THE HARDWARE -> CREATE A VIRTUAL DEVICE (context for the D12  API)
 
@@ -65,9 +71,17 @@ namespace Engine {
 		*/
 	}
 
+	void RenderAPI::UpdateDraw()
+	{
+		frameCount++;
+		PRINT_W_N("FrameCount:" << frameCount)
+	}
+
 	void RenderAPI::Release()
 	{
-		mCommandList.Release();	
+		mSwapChain.Release();
+
+		mCommandList.Release();
 
 		mCommandQueue.Release();
 

@@ -5,14 +5,11 @@
 
 namespace Engine {
 
-
-	class DXGIFactory : Microsoft::WRL::ComPtr<IDXGIFactory>
+	class DXGIFactory : public Microsoft::WRL::ComPtr<IDXGIFactory2>
 	{
 	public:
 		DXGIFactory();
 
 		DXGIAdapter GetAdapter();
-
 	};
 }
-

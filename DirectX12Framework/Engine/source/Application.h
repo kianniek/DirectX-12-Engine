@@ -32,6 +32,9 @@ namespace Engine {
 		HWND mWindowHandle = nullptr;
 		bool mIsRunning = false; //flag to check if the application is running 
 
+	private:
+		UINT mWidth = 720;
+		UINT mHeight = 720;
 	};
 }
 

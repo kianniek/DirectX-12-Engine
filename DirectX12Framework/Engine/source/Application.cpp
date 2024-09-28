@@ -67,8 +67,8 @@ namespace Engine {
 			WS_OVERLAPPEDWINDOW,			//window style
 			460,							//initial x position
 			20,								//initial y position
-			720,							//initial x size
-			720, 							//initial y size
+			mWidth,							//initial x size
+			mHeight, 							//initial y size
 			0, 								//parent window handle
 			0, 								//window menu handle
 			0, 								//initial x position
@@ -90,7 +90,7 @@ namespace Engine {
 	void Application::OnCreate(HWND hwnd)
 	{
 		std::cout << "Created the actual window" << std::endl;
-		mRenderer.Initialize(hwnd);
+		mRenderer.Initialize(hwnd, mWidth, mHeight);
 
 	}
 
@@ -112,6 +112,8 @@ namespace Engine {
 			TranslateMessage(&message);
 			DispatchMessage(&message);
 		}
+
+		mRenderer.UpdateDraw();
 	}
 
 	void Application::OnDestroy()
