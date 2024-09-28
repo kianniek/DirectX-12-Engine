@@ -36,6 +36,7 @@ namespace Engine {
 		UINT mWidth = 0;
 		UINT mHeight = 0;
 		UINT frameCount = 0;
+
 	};
 }
 

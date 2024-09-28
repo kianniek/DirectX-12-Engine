@@ -73,12 +73,57 @@ namespace Engine {
 
 	void RenderAPI::UpdateDraw()
 	{
-		frameCount++;
-		PRINT_W_N("FrameCount:" << frameCount)
+		//Set it to a render target state
+		D3D12_RESOURCE_BARRIER barrier = {};
+		barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
+		barrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
+		barrier.Transition.pResource = mSwapChain.GetCurrentRenderTarget();
+		barrier.Transition.Subresource = 0;
+		barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_PRESENT;
+		barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_RENDER_TARGET;
+
+		mCommandList.GFXCmd()->ResourceBarrier(1, &barrier);
+
+		//Try to clear the color of it
+		const float clearColor[] = { 1.0f ,0.0f, 1.0f, 1.0f };
+		D3D12_CPU_DESCRIPTOR_HANDLE rtvHandle = mSwapChain.GetCurrentRTVHandle();
+		mCommandList.GFXCmd()->ClearRenderTargetView(rtvHandle, clearColor, 0, 0);
+
+		//setting it back to the present state
+		barrier = {};
+		barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
+		barrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
+		barrier.Transition.pResource = mSwapChain.GetCurrentRenderTarget();
+		barrier.Transition.Subresource = 0;
+		barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_RENDER_TARGET;
+		barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_PRESENT;
+
+		mCommandList.GFXCmd()->ResourceBarrier(1, &barrier);
+
+		//close the command list
+		mCommandList.GFXCmd()->Close();
+
+		//execute the commands in the command list
+		mCommandQueue->ExecuteCommandLists(1, (ID3D12CommandList* const*)mCommandList.GetAddressOf());
+		mCommandQueue.M_ExecuteCommandList(mCommandList.Get());
+
+		mSwapChain.Present();
+
+		//wait for the allocator to be done / not be in use
+		while (mCommandQueue.GetFence()->GetCompletedValue() < mCommandQueue.M_GetCurrentFenceValue())
+		{
+			_mm_pause();
+		}
+
+		//try to reset it
+		mCommandList.ResetCommandList();
+
 	}
 
 	void RenderAPI::Release()
 	{
+		mCommandQueue.FlushQueue();
+
 		mSwapChain.Release();
 
 		mCommandList.Release();

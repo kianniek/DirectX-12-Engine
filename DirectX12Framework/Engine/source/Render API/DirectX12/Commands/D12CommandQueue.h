@@ -15,7 +15,10 @@ namespace Engine
 
 		void Initialize(ID3D12Device* pDevice);
 
+		void M_ExecuteCommandList(ID3D12CommandList* pCommandList);
+
 		void Release();
+		void FlushQueue();
 
 		inline ID3D12Fence* GetFence() { return mFence.Get(); }
 

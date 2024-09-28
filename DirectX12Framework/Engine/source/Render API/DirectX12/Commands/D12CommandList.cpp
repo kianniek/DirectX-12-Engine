@@ -17,6 +17,13 @@ namespace Engine
 		KOSMO_EVAL_HR(pDevice->CreateCommandList(0,D3D12_COMMAND_LIST_TYPE_DIRECT,mAllocator.Get(), nullptr, IID_PPV_ARGS(GetAddressOf())), "Error creating the command list")
 	}
 
+	void D12CommandList::ResetCommandList()
+	{
+		mAllocator.Get()->Reset();
+
+		GFXCmd()->Reset(mAllocator.Get(), 0);
+	}
+
 	void D12CommandList::Release()
 	{
 		if (Get())

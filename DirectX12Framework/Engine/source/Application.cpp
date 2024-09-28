@@ -113,7 +113,10 @@ namespace Engine {
 			DispatchMessage(&message);
 		}
 
-		mRenderer.UpdateDraw();
+		if (mIsRunning)
+		{
+			mRenderer.UpdateDraw();
+		}
 	}
 
 	void Application::OnDestroy()
