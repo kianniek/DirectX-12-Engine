@@ -9,6 +9,47 @@
   <img src="https://img.shields.io/badge/Windows-10-lightgrey?style=flat&logo=windows&logoColor=white" alt="Windows 10>">
 </p>
 
+```mermaid
+graph TD
+    A[Developing a DirectX 12 Rendering Engine] --> B[Initial Setup and Context Creation]
+    B --> C[Rendering Pipeline Development]
+    C --> D[Shader System Implementation]
+    D --> E[Rendering Primitive Shapes]
+    E --> F[Texture Mapping]
+    F --> G[Basic Lighting Implementation]
+    G --> H[Performance Optimization]
+    H --> I[Optional Advanced Features]
+
+    B --> B1[Objective: Establish a functional DirectX 12 environment]
+    B --> B2[Tasks: Configure project settings, initialize DirectX structures, create a basic window]
+
+    style B fill:#76c7c0,stroke:#ffffff,stroke-width:2px,color: black;
+    style B1 fill:#76c7c0,stroke:#ffffff,stroke-width:2px,color: black;
+    style B2 fill:#76c7c0,stroke:#ffffff,stroke-width:2px,color: black;
+
+    C --> C1[Objective: Develop the core rendering pipeline]
+    C --> C2[Tasks: Create root signature, implement command lists and queues, establish back buffer]
+
+    D --> D1[Objective: Implement a system for managing shaders]
+    D --> D2[Tasks: Write basic HLSL shaders, develop shader management system, integrate shaders]
+
+    E --> E1[Objective: Render basic shapes and establish framework]
+    E --> E2[Tasks: Develop vertex/index buffers, implement transformation system, verify setup]
+
+    F --> F1[Objective: Add support for textures in model rendering]
+    F --> F2[Tasks: Load/manage texture resources, bind textures to shaders, adapt shader pipeline]
+
+    G --> G1[Objective: Implement foundational lighting models]
+    G --> G2[Tasks: Introduce lighting calculations, set up uniform buffers, test lighting effects]
+
+    H --> H1[Objective: Enhance rendering performance]
+    H --> H2[Tasks: Implement double/triple buffering, optimize memory allocation, introduce synchronization]
+
+    I --> I1[Objective: Extend the engine’s functionality]
+    I --> I2[Tasks: Implement shadow mapping, experiment with PBR, introduce post-processing effects]
+
+```
+
 <h2>Project Overview</h2>
 <p>This project aims to create a rendering engine using DirectX 12 to gain a more comprehensive understanding of graphics programming and low-level systems operations. DirectX 12 offers fine-grained control over hardware resources, providing efficiency benefits but also introducing significant complexity. This endeavor will require in-depth work with rendering pipelines, memory management, and GPU programming.</p>
 
