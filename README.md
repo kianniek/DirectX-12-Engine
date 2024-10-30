@@ -6,7 +6,7 @@
   <img src="https://img.shields.io/badge/DirectX-12-blueviolet?style=flat&logo=directx&logoColor=white" alt="DirectX 12">
   <img src="https://img.shields.io/badge/HLSL-grey?style=flat&logo=microsoft&logoColor=white" alt="HLSL">
   <img src="https://img.shields.io/badge/Visual%20Studio-2019-blue?style=flat&logo=visual-studio&logoColor=white" alt="Visual Studio">
-  <img src="https://img.shields.io/badge/Windows-10-lightgrey?style=flat&logo=windows&logoColor=white" alt="Windows 10">
+  <img src="https://img.shields.io/badge/Windows-10-lightgrey?style=flat&logo=windows&logoColor=white" alt="Windows 10>">
 </p>
 
 <h2>Project Overview</h2>
@@ -164,4 +164,4 @@
 </ul>
 
 <h2>Conclusion</h2>
-<p>Completing a DirectX 12 rendering engine will yield substantial technical experience with graphics programming, memory management, and low-level systems operations. This project will offer insight into the intricacies of GPU operations and foster skills that are directly applicable to a range of high-performance computing applications. The expected outcome includes a functional rendering engine and a deeper, practically-informed understanding of modern graphics API design and implementation.</p>
+<p>Completing a DirectX 12 rendering engine will yield technical experience with graphics programming, memory management, and low-level systems operations. With this project I want to gain insight into the intricacies of GPU operations and foster skills that are directly applicable to a range of high-performance computing applications. The expected outcome includes a functional rendering engine and a deeper, practically informed understanding of modern graphics API design and implementation.</p>
