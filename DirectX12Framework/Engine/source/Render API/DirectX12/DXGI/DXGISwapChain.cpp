@@ -95,9 +95,9 @@ namespace Engine {
 
 		if (Get()) {
 
-			Reset();
 			DropBuffers();
 			mRTVHeap.Reset();
+			Reset();
 		}
 
 

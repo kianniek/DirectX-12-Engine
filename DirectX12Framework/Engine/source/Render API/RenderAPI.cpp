@@ -1,13 +1,19 @@
 #include "pch.h"
 #include "RenderAPI.h"
 
+#include "RenderDataTypes.h"
 #include "DirectX12/DXGI/DXGIFactory.h"
 #include "DirectX12/DXGI/DXGIAdapter.h"
 
 #include "DirectX12/Debug/D12Debug.h"
 
+#include "DirectX12/Pipeline/HLSLShader.h"
+
+
+
 
 namespace Engine {
+	using namespace Render;
 
 	RenderAPI::~RenderAPI()
 	{
@@ -42,6 +48,48 @@ namespace Engine {
 		mCommandList.Initialize(mDevice.Get());
 
 		mSwapChain.Initialize(mDevice.Get(), factory.Get(), mCommandQueue.Get(), hwnd, mWidth, mHeight);
+
+		mDynamicVertexBuffer.Initialize(mDevice.Get(), KBs(16), D3D12_HEAP_TYPE_UPLOAD, D3D12_RESOURCE_STATE_GENERIC_READ);
+		mDynamicVertexBuffer.Get()->SetName(L"Dynamic vertex buffer");
+
+		Vertex vertexData;
+		vertexData.position = { 1.0f, 5.0f, 3.0f };
+		vertexData.color = { 0.0f, 1.0f, 0.0f, 1.0f };
+
+		void* destination = nullptr;
+
+		mDynamicVertexBuffer->Map(0, 0, &destination);
+
+		memcpy(destination, &vertexData, sizeof(Vertex));
+
+		mDynamicVertexBuffer->Unmap(0, 0);
+
+		HLSLShader testShader;
+
+		testShader.Initialize(L"shaders/VS.hlsl", HLSLShader::ShaderType::VERTEX);
+
+		/*
+		 * Create shader programs
+		 * - Wrapper for the shaders and their compilations
+		 * - Create the actual shaders/programs
+		 *
+		 * Setup two input layouts (one for vertex/index buffers + one for datastructures needed for the pipeline/shader programs)
+		 * - The pipeline input state
+		 * - The root signature
+		 *
+		 * Set up the actual pipeline
+		 * - Wrapper
+		 * -- Set parameters
+		 * - Create the functionality that couples everything into a complete pipeline
+		 */
+
+
+		/*
+		 * ONLY CPU = default ram / cache
+		 * ONLY GPU =  default heap on GPU (VRAM)
+		 * Shared CPU and GPU = with rad/write for all - It's stored in the GPU
+		 * Read-back memory on GPU (with read on the CPU)
+		 */
 
 		if (!hasCreatedDevice) {
 			// Log the error
@@ -122,6 +170,9 @@ namespace Engine {
 
 	void RenderAPI::Release()
 	{
+
+		mDynamicVertexBuffer.Release();
+
 		mCommandQueue.FlushQueue();
 
 		mSwapChain.Release();
