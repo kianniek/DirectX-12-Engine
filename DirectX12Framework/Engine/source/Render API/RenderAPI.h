@@ -6,6 +6,7 @@
 #include "DirectX12/Base/D12Device.h"
 #include "DirectX12/Commands/D12CommandQueue.h"
 #include "DirectX12/Commands/D12CommandList.h"
+#include "DirectX12/Pipeline/D12PipelineState.h"
 #include "DirectX12/Resource/D12Resource.h"	
 
 
@@ -32,9 +33,13 @@ namespace Engine {
 		D12CommandList mCommandList;
 
 		DXGISwapChain mSwapChain;
+		D12PipelineState mBasePipeline;
 
 		D12Resource mDynamicVertexBuffer;
+		D3D12_VERTEX_BUFFER_VIEW mDynamicVBView;
 
+		D3D12_VIEWPORT mViewport;
+		D3D12_RECT mSRRect;
 
 	private:
 		UINT mWidth = 0;
