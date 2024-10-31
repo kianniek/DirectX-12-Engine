@@ -8,9 +8,7 @@
 #include "DirectX12/Debug/D12Debug.h"
 
 #include "DirectX12/Pipeline/HLSLShader.h"
-
-
-
+#include "DirectX12/Pipeline/D12RootSignature.h"
 
 namespace Engine {
 	using namespace Render;
@@ -68,6 +66,9 @@ namespace Engine {
 
 		testShader.Initialize(L"shaders/VS.hlsl", HLSLShader::ShaderType::VERTEX);
 
+		D12RootSignature rstest;
+		rstest.Initialize(mDevice.Get());
+
 		/*
 		 * Create shader programs
 		 * - Wrapper for the shaders and their compilations
@@ -75,7 +76,9 @@ namespace Engine {
 		 *
 		 * Setup two input layouts (one for vertex/index buffers + one for datastructures needed for the pipeline/shader programs)
 		 * - The pipeline input state
+		 * -- Wrapper?
 		 * - The root signature
+		 * --Wrapper
 		 *
 		 * Set up the actual pipeline
 		 * - Wrapper
