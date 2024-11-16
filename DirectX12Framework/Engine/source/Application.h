@@ -33,8 +33,8 @@ namespace Engine {
 		bool mIsRunning = false; //flag to check if the application is running 
 
 	private:
-		UINT mWidth = 720;
-		UINT mHeight = 720;
+		UINT mWidth = 960;
+		UINT mHeight = 540;
 	};
 }
 

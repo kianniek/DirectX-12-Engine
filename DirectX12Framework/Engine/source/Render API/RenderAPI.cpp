@@ -12,6 +12,8 @@
 #include "DirectX12/Pipeline/HLSLShader.h"
 #include "DirectX12/Pipeline/D12RootSignature.h"
 
+#include "Utilities/Utilities.h"
+
 namespace Engine {
 	using namespace Render;
 
@@ -54,6 +56,57 @@ namespace Engine {
 
 		std::vector<Vertex> vertices;
 
+#define G_BOX_VERTICES 18
+
+		Vertex vertecesBox[G_BOX_VERTICES];
+
+		// Front face
+		vertecesBox[0].position = { -1.0f, -1.0f, -1.0f };
+		vertecesBox[0].color = { 0.0f, 1.0f, 0.0f, 1.0f };
+		vertecesBox[1].position = { -1.0f, 1.0f, -1.0f };
+		vertecesBox[1].color = { 0.0f, 1.0f, 0.0f, 1.0f };
+		vertecesBox[2].position = { 1.0f, -1.0f, -1.0f };
+		vertecesBox[2].color = { 0.0f, 1.0f, 0.0f, 1.0f };
+
+		vertecesBox[3].position = { -1.0f, 1.0f, -1.0f };
+		vertecesBox[3].color = { 0.0f, 1.0f, 0.0f, 1.0f };
+		vertecesBox[4].position = { 1.0f, 1.0f, -1.0f };
+		vertecesBox[4].color = { 0.0f, 1.0f, 0.0f, 1.0f };
+		vertecesBox[5].position = { 1.0f, -1.0f, -1.0f };
+		vertecesBox[5].color = { 0.0f, 1.0f, 0.0f, 1.0f };
+
+		// Back face
+		vertecesBox[6].position = { -1.0f, -1.0f, 1.0f };
+		vertecesBox[6].color = { 1.0f, 0.0f, 0.0f, 1.0f };
+		vertecesBox[7].position = { -1.0f, 1.0f, 1.0f };
+		vertecesBox[7].color = { 1.0f, 1.0f, 0.0f, 1.0f };
+		vertecesBox[8].position = { 1.0f, -1.0f, 1.0f };
+		vertecesBox[8].color = { 1.0f, 0.0f, 0.0f, 1.0f };
+
+		vertecesBox[9].position = { -1.0f, 1.0f, 1.0f };
+		vertecesBox[9].color = { 1.0f, 0.0f, 0.0f, 1.0f };
+		vertecesBox[10].position = { 1.0f, 1.0f, 1.0f };
+		vertecesBox[10].color = { 1.0f, 0.0f, 0.0f, 1.0f };
+		vertecesBox[11].position = { 1.0f, -1.0f, 1.0f };
+		vertecesBox[11].color = { 1.0f, 0.0f, 0.0f, 1.0f };
+
+		// Side face
+		vertecesBox[12].position = { -1.0f, -1.0f, 1.0f };
+		vertecesBox[12].color = { 0.0f, 0.0f, 1.0f, 1.0f };
+		vertecesBox[13].position = { -1.0f, 1.0f, 1.0f };
+		vertecesBox[13].color = { 0.0f, 0.0f, 1.0f, 1.0f };
+		vertecesBox[14].position = { -1.0f, -1.0f, -1.0f };
+		vertecesBox[14].color = { 0.0f, 0.0f, 1.0f, 1.0f };
+
+		vertecesBox[15].position = { -1.0f, 1.0f, 1.0f };
+		vertecesBox[15].color = { 0.0f, 0.0f, 1.0f, 1.0f };
+		vertecesBox[16].position = { -1.0f, 1.0f, -1.0f };
+		vertecesBox[16].color = { 0.0f, 0.0f, 1.0f, 1.0f };
+		vertecesBox[17].position = { -1.0f, -1.0f, -1.0f };
+		vertecesBox[17].color = { 0.0f, 0.0f, 1.0f, 1.0f };
+
+
+
 		for (int i = 0; i < 3; i++) {
 			Vertex vertexData;
 			vertexData.color = { 0.0f,1.0f,0.0f,1.0f };
@@ -71,16 +124,9 @@ namespace Engine {
 			vertices.push_back(vertexData);
 		}
 
-		
 
-		void* destination = nullptr;
 
-		mDynamicVertexBuffer->Map(0, 0, &destination);
-
-		//memcpy(destination, &vertexData, sizeof(Vertex));
-		memcpy(destination, vertices.data(), sizeof(Vertex) * vertices.size());
-
-		mDynamicVertexBuffer->Unmap(0, 0);
+		memcpy(mDynamicVertexBuffer.GetCPUMemory(), vertecesBox, sizeof(Vertex) * G_BOX_VERTICES);
 
 		mDynamicVBView.BufferLocation = mDynamicVertexBuffer.Get()->GetGPUVirtualAddress();
 		mDynamicVBView.StrideInBytes = sizeof(Vertex);
@@ -116,6 +162,18 @@ namespace Engine {
 
 		mBasePipeline.Initialize(mDevice.Get());
 
+		mDepthBuffer.InitializeAsDepthBuffer(mDevice.Get(), width, height);
+
+		mDepthDescHeap.InitializeDepthHeap(mDevice.Get());
+
+		D3D12_DEPTH_STENCIL_VIEW_DESC dsvDesc = {};
+		dsvDesc.Format = DXGI_FORMAT_D32_FLOAT;
+		dsvDesc.ViewDimension = D3D12_DSV_DIMENSION_TEXTURE2D;
+		dsvDesc.Texture2D.MipSlice = 0;
+		dsvDesc.Flags = D3D12_DSV_FLAG_NONE;
+
+		mDevice->CreateDepthStencilView(mDepthBuffer.Get(), &dsvDesc, mDepthDescHeap.Get()->GetCPUDescriptorHandleForHeapStart());
+
 		mViewport.TopLeftX = 0;
 		mViewport.TopLeftY = 0;
 		mViewport.Width = mWidth;
@@ -128,36 +186,28 @@ namespace Engine {
 		mSRRect.top = 0;
 		mSRRect.bottom = mViewport.Height;
 
-		if (!hasCreatedDevice) {
-			// Log the error
-			std::cerr << "Failed to create D12 device." << std::endl;
+		DirectX::XMMATRIX viewMatrix;
 
-			// Handle cleanup
-			// release any resources that might have been partially allocated.
-			//TODO: Cleanup();
+		viewMatrix = DirectX::XMMatrixLookAtLH
+		(
+			{-3.0f, 2.0f, -3.0f, 0.0f},
+			{ 0.0f, 0.0f, 0.0f, 0.0f },
+			{ 0.0f, 1.0f, 0.0f, 0.0f }
+		);
 
-			// Depending on your application, you may:
-			// 1. Return from the current function
-			// 2. Exit the application with an error code
-			// 3. Retry device creation under different conditions (e.g., lower feature levels)
+		DirectX::XMMATRIX projectionMatrix;
 
-			// we'll exit the application to prevent any further D12 calls.
-			std::exit(EXIT_FAILURE);
-		}
+		projectionMatrix = DirectX::XMMatrixPerspectiveFovLH(1.1943951f, 16.0f / 9.0f, 1.0f, 50.0f);
 
-		// Proceed with other D12 calls only if the device was successfully created
-		// Your other D12 initialization or rendering code here
+		mViewProjectionMatrix = viewMatrix * projectionMatrix;
 
-		/*
-		ACCESS THE HARDWARE -> CREATE A VIRTUAL DEVICE (context for the D12  API)
-
-		COM SYSTEM
-
-		*/
+		mCBPassData.Initialize(mDevice.Get(), Utils::CalculateConstantbufferAlignment(sizeof(PassData)), D3D12_HEAP_TYPE_UPLOAD, D3D12_RESOURCE_STATE_GENERIC_READ);
 	}
 
 	void RenderAPI::UpdateDraw()
 	{
+		memcpy(mCBPassData.GetCPUMemory(), &mViewProjectionMatrix, sizeof(PassData));
+
 		//Set it to a render target state
 		D3D12_RESOURCE_BARRIER barrier = {};
 		barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
@@ -172,13 +222,14 @@ namespace Engine {
 		//Try to clear the color of it
 		const float clearColor[] = { 0.0f ,0.0f, 0.0f, 1.0f };
 		D3D12_CPU_DESCRIPTOR_HANDLE rtvHandle = mSwapChain.GetCurrentRTVHandle();
-		mCommandList.GFXCmd()->ClearRenderTargetView(rtvHandle, clearColor, 0, 0);
+		D3D12_CPU_DESCRIPTOR_HANDLE dsvHandle = mDepthDescHeap->GetCPUDescriptorHandleForHeapStart();
 
-		mCommandList.GFXCmd()->OMSetRenderTargets(1, &rtvHandle, false, 0);
+		mCommandList.GFXCmd()->ClearRenderTargetView(rtvHandle, clearColor, 0, 0);
+		mCommandList.GFXCmd()->ClearDepthStencilView(dsvHandle, D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, 0);
+		mCommandList.GFXCmd()->OMSetRenderTargets(1, &rtvHandle, false, &dsvHandle);
 
 		mCommandList.GFXCmd()->RSSetViewports(1, &mViewport);
 		mCommandList.GFXCmd()->RSSetScissorRects(1, &mSRRect);
-
 
 
 		mCommandList.GFXCmd()->SetGraphicsRootSignature(mBasePipeline.GetRS());
@@ -187,6 +238,8 @@ namespace Engine {
 
 		mCommandList.GFXCmd()->IASetVertexBuffers(0, 1, &mDynamicVBView);
 
+		mCommandList.GFXCmd()->SetGraphicsRootConstantBufferView(0, mCBPassData.Get()->GetGPUVirtualAddress());
+
 		/*
 
 		Do drawing stuff here
@@ -194,7 +247,7 @@ namespace Engine {
 
 		*/
 
-		mCommandList.GFXCmd()->DrawInstanced(3, 1, 0, 0);
+		mCommandList.GFXCmd()->DrawInstanced(G_BOX_VERTICES, 1, 0, 0);
 
 
 		//setting it back to the present state

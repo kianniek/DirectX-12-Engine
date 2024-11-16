@@ -1,15 +1,19 @@
 #pragma once
 #include "EngineMin.h"
 #include <Windows.h>
+#include <DirectXMath.h>
+
+#include "RenderDataTypes.h"
 
 #include "DirectX12/DXGI/DXGISwapChain.h"
+
 #include "DirectX12/Base/D12Device.h"
 #include "DirectX12/Commands/D12CommandQueue.h"
 #include "DirectX12/Commands/D12CommandList.h"
-#include "DirectX12/Pipeline/D12PipelineState.h"
 #include "DirectX12/Resource/D12Resource.h"	
 
-
+#include "DirectX12/Pipeline/D12PipelineState.h"
+#include "DirectX12/Descriptors/D12DescriptorHeap.h"
 
 namespace Engine {
 
@@ -33,13 +37,23 @@ namespace Engine {
 		D12CommandList mCommandList;
 
 		DXGISwapChain mSwapChain;
+
 		D12PipelineState mBasePipeline;
+		D12Resource mDepthBuffer;
+
+		D3D12_VIEWPORT mViewport;
+		D3D12_RECT mSRRect;
+
+		D12DescriptorHeap mDepthDescHeap;
 
 		D12Resource mDynamicVertexBuffer;
 		D3D12_VERTEX_BUFFER_VIEW mDynamicVBView;
 
-		D3D12_VIEWPORT mViewport;
-		D3D12_RECT mSRRect;
+		D12Resource mCBPassData;
+
+	
+
+		DirectX::XMMATRIX mViewProjectionMatrix;
 
 	private:
 		UINT mWidth = 0;
