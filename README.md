@@ -30,6 +30,9 @@ graph TD
     C --> C1[Objective: Develop the core rendering pipeline]
     C --> C2[Tasks: Create root signature, implement command lists and queues, establish back buffer]
 
+    style C fill:#76c7c0,stroke:#ffffff,stroke-width:2px,color: black;
+    style C2 fill:#76c7c0,stroke:#ffffff,stroke-width:2px,color: black;
+
     D --> D1[Objective: Implement a system for managing shaders]
     D --> D2[Tasks: Write basic HLSL shaders, develop shader management system, integrate shaders]
 
