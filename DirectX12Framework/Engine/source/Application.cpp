@@ -32,26 +32,9 @@ namespace Engine {
                         break;
                 }
 
-                case WM_MOUSEMOVE: {
+               case WM_MOUSEMOVE: {
                         Application* pointer = reinterpret_cast<Application*>(GetWindowLongPtr(hwnd, GWLP_USERDATA));
-                        if (wparam & MK_LBUTTON)
-                        {
-                                int x = LOWORD(lparam);
-                                int y = HIWORD(lparam);
-                                int dx = x - pointer->mLastMousePos.x;
-                                int dy = y - pointer->mLastMousePos.y;
-                                pointer->mRotX += dy * 0.01f;
-                                pointer->mRotY += dx * 0.01f;
-                                pointer->mRenderer.SetCubeWorldMatrix(
-                                        DirectX::XMMatrixRotationX(pointer->mRotX) *
-                                        DirectX::XMMatrixRotationY(pointer->mRotY));
-                                pointer->mLastMousePos = { x, y };
-                        }
-                        else
-                        {
-                                pointer->mLastMousePos.x = LOWORD(lparam);
-                                pointer->mLastMousePos.y = HIWORD(lparam);
-                        }
+                        pointer->OnMouseMove(wparam, LOWORD(lparam), HIWORD(lparam));
                         break;
                 }
 
@@ -114,7 +97,8 @@ namespace Engine {
         {
                 std::cout << "Created the actual window" << std::endl;
                 mRenderer.Initialize(hwnd, mWidth, mHeight);
-                mRenderer.SetCubeWorldMatrix(DirectX::XMMatrixIdentity());
+                mRenderer.SetCubeWorldMatrix(
+                        DirectX::XMMatrixTranslation(0.0f, 1.0f, 0.0f));
 
         }
 
@@ -143,14 +127,31 @@ namespace Engine {
 		}
 	}
 
-	void Application::OnDestroy()
-	{
-		std::cout << "Closed the window \nshutting down the application" << std::endl;
+        void Application::OnDestroy()
+        {
+                std::cout << "Closed the window \nshutting down the application" << std::endl;
 
-		mRenderer.Release();
-		DXGIDebug::Get().GetLiveObjects();
+                mRenderer.Release();
+                DXGIDebug::Get().GetLiveObjects();
 
-		mIsRunning = false;
-	}
+                mIsRunning = false;
+        }
 
+        void Application::OnMouseMove(WPARAM state, int x, int y)
+        {
+                if (state & MK_LBUTTON)
+                {
+                        int dx = x - mLastMousePos.x;
+                        int dy = y - mLastMousePos.y;
+                        mRotX += dy * 0.01f;
+                        mRotY += dx * 0.01f;
+                        mRenderer.SetCubeWorldMatrix(
+                                DirectX::XMMatrixTranslation(0.0f, 1.0f, 0.0f) *
+                                DirectX::XMMatrixRotationX(mRotX) *
+                                DirectX::XMMatrixRotationY(mRotY));
+                }
+
+                mLastMousePos.x = x;
+                mLastMousePos.y = y;
+        }
 }

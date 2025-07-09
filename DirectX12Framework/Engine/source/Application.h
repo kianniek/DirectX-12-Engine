@@ -19,7 +19,9 @@ namespace Engine {
 
 		void Update();
 
-		void OnDestroy();
+                void OnDestroy();
+
+                void OnMouseMove(WPARAM state, int x, int y);
 
 		inline bool IsRunning() { return mIsRunning; } //return flag
 
