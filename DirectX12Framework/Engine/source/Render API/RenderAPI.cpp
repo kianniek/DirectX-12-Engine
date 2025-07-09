@@ -51,82 +51,95 @@ namespace Engine {
 
 		mSwapChain.Initialize(mDevice.Get(), factory.Get(), mCommandQueue.Get(), hwnd, mWidth, mHeight);
 
-		mDynamicVertexBuffer.Initialize(mDevice.Get(), KBs(16), D3D12_HEAP_TYPE_UPLOAD, D3D12_RESOURCE_STATE_GENERIC_READ);
-		mDynamicVertexBuffer.Get()->SetName(L"Dynamic vertex buffer");
+               mDynamicVertexBuffer.Initialize(mDevice.Get(), KBs(16), D3D12_HEAP_TYPE_UPLOAD, D3D12_RESOURCE_STATE_GENERIC_READ);
+               mDynamicVertexBuffer.Get()->SetName(L"Dynamic vertex buffer");
 
-		std::vector<Vertex> vertices;
+                mTextureDescHeap.InitializeSRVHeap(mDevice.Get());
+                {
+                        D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc = {};
+                        srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+                        srvDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+                        srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
+                        srvDesc.Texture2D.MipLevels = 1;
+                        mDevice->CreateShaderResourceView(nullptr, &srvDesc, mTextureDescHeap->GetCPUDescriptorHandleForHeapStart());
+                }
 
-#define G_BOX_VERTICES 18
+                std::vector<Vertex> vertices;
 
-		Vertex vertecesBox[G_BOX_VERTICES];
+#define G_CUBE_VERTICES 36
+#define G_PLANE_VERTICES 6
 
-		// Front face
-		vertecesBox[0].position = { -1.0f, -1.0f, -1.0f };
-		vertecesBox[0].color = { 0.0f, 1.0f, 0.0f, 1.0f };
-		vertecesBox[1].position = { -1.0f, 1.0f, -1.0f };
-		vertecesBox[1].color = { 0.0f, 1.0f, 0.0f, 1.0f };
-		vertecesBox[2].position = { 1.0f, -1.0f, -1.0f };
-		vertecesBox[2].color = { 0.0f, 1.0f, 0.0f, 1.0f };
+                Vertex cubeVerts[G_CUBE_VERTICES];
 
-		vertecesBox[3].position = { -1.0f, 1.0f, -1.0f };
-		vertecesBox[3].color = { 0.0f, 1.0f, 0.0f, 1.0f };
-		vertecesBox[4].position = { 1.0f, 1.0f, -1.0f };
-		vertecesBox[4].color = { 0.0f, 1.0f, 0.0f, 1.0f };
-		vertecesBox[5].position = { 1.0f, -1.0f, -1.0f };
-		vertecesBox[5].color = { 0.0f, 1.0f, 0.0f, 1.0f };
+                // Cube vertices with normals as colors
+                auto normalColor = [](float x, float y, float z) {
+                        return DirectX::XMFLOAT4(x * 0.5f + 0.5f,
+                                                  y * 0.5f + 0.5f,
+                                                  z * 0.5f + 0.5f,
+                                                  1.0f);
+                };
 
-		// Back face
-		vertecesBox[6].position = { -1.0f, -1.0f, 1.0f };
-		vertecesBox[6].color = { 1.0f, 0.0f, 0.0f, 1.0f };
-		vertecesBox[7].position = { -1.0f, 1.0f, 1.0f };
-		vertecesBox[7].color = { 1.0f, 1.0f, 0.0f, 1.0f };
-		vertecesBox[8].position = { 1.0f, -1.0f, 1.0f };
-		vertecesBox[8].color = { 1.0f, 0.0f, 0.0f, 1.0f };
+                // Front (-Z)
+                cubeVerts[0]  = { {-1.f,-1.f,-1.f}, normalColor(0,0,-1), {0.f,1.f} };
+                cubeVerts[1]  = { {-1.f, 1.f,-1.f}, normalColor(0,0,-1), {0.f,0.f} };
+                cubeVerts[2]  = { { 1.f,-1.f,-1.f}, normalColor(0,0,-1), {1.f,1.f} };
+                cubeVerts[3]  = { {-1.f, 1.f,-1.f}, normalColor(0,0,-1), {0.f,0.f} };
+                cubeVerts[4]  = { { 1.f, 1.f,-1.f}, normalColor(0,0,-1), {1.f,0.f} };
+                cubeVerts[5]  = { { 1.f,-1.f,-1.f}, normalColor(0,0,-1), {1.f,1.f} };
 
-		vertecesBox[9].position = { -1.0f, 1.0f, 1.0f };
-		vertecesBox[9].color = { 1.0f, 0.0f, 0.0f, 1.0f };
-		vertecesBox[10].position = { 1.0f, 1.0f, 1.0f };
-		vertecesBox[10].color = { 1.0f, 0.0f, 0.0f, 1.0f };
-		vertecesBox[11].position = { 1.0f, -1.0f, 1.0f };
-		vertecesBox[11].color = { 1.0f, 0.0f, 0.0f, 1.0f };
+                // Back (+Z)
+                cubeVerts[6]  = { {-1.f,-1.f, 1.f}, normalColor(0,0,1), {0.f,1.f} };
+                cubeVerts[7]  = { {-1.f, 1.f, 1.f}, normalColor(0,0,1), {0.f,0.f} };
+                cubeVerts[8]  = { { 1.f,-1.f, 1.f}, normalColor(0,0,1), {1.f,1.f} };
+                cubeVerts[9]  = { {-1.f, 1.f, 1.f}, normalColor(0,0,1), {0.f,0.f} };
+                cubeVerts[10] = { { 1.f, 1.f, 1.f}, normalColor(0,0,1), {1.f,0.f} };
+                cubeVerts[11] = { { 1.f,-1.f, 1.f}, normalColor(0,0,1), {1.f,1.f} };
 
-		// Side face
-		vertecesBox[12].position = { -1.0f, -1.0f, 1.0f };
-		vertecesBox[12].color = { 0.0f, 0.0f, 1.0f, 1.0f };
-		vertecesBox[13].position = { -1.0f, 1.0f, 1.0f };
-		vertecesBox[13].color = { 0.0f, 0.0f, 1.0f, 1.0f };
-		vertecesBox[14].position = { -1.0f, -1.0f, -1.0f };
-		vertecesBox[14].color = { 0.0f, 0.0f, 1.0f, 1.0f };
+                // Left (-X)
+                cubeVerts[12] = { {-1.f,-1.f, 1.f}, normalColor(-1,0,0), {0.f,1.f} };
+                cubeVerts[13] = { {-1.f, 1.f, 1.f}, normalColor(-1,0,0), {0.f,0.f} };
+                cubeVerts[14] = { {-1.f,-1.f,-1.f}, normalColor(-1,0,0), {1.f,1.f} };
+                cubeVerts[15] = { {-1.f, 1.f, 1.f}, normalColor(-1,0,0), {0.f,0.f} };
+                cubeVerts[16] = { {-1.f, 1.f,-1.f}, normalColor(-1,0,0), {1.f,0.f} };
+                cubeVerts[17] = { {-1.f,-1.f,-1.f}, normalColor(-1,0,0), {1.f,1.f} };
 
-		vertecesBox[15].position = { -1.0f, 1.0f, 1.0f };
-		vertecesBox[15].color = { 0.0f, 0.0f, 1.0f, 1.0f };
-		vertecesBox[16].position = { -1.0f, 1.0f, -1.0f };
-		vertecesBox[16].color = { 0.0f, 0.0f, 1.0f, 1.0f };
-		vertecesBox[17].position = { -1.0f, -1.0f, -1.0f };
-		vertecesBox[17].color = { 0.0f, 0.0f, 1.0f, 1.0f };
+                // Right (+X)
+                cubeVerts[18] = { { 1.f,-1.f,-1.f}, normalColor(1,0,0), {0.f,1.f} };
+                cubeVerts[19] = { { 1.f, 1.f,-1.f}, normalColor(1,0,0), {0.f,0.f} };
+                cubeVerts[20] = { { 1.f,-1.f, 1.f}, normalColor(1,0,0), {1.f,1.f} };
+                cubeVerts[21] = { { 1.f, 1.f,-1.f}, normalColor(1,0,0), {0.f,0.f} };
+                cubeVerts[22] = { { 1.f, 1.f, 1.f}, normalColor(1,0,0), {1.f,0.f} };
+                cubeVerts[23] = { { 1.f,-1.f, 1.f}, normalColor(1,0,0), {1.f,1.f} };
+
+                // Top (+Y)
+                cubeVerts[24] = { {-1.f, 1.f,-1.f}, normalColor(0,1,0), {0.f,1.f} };
+                cubeVerts[25] = { {-1.f, 1.f, 1.f}, normalColor(0,1,0), {0.f,0.f} };
+                cubeVerts[26] = { { 1.f, 1.f,-1.f}, normalColor(0,1,0), {1.f,1.f} };
+                cubeVerts[27] = { {-1.f, 1.f, 1.f}, normalColor(0,1,0), {0.f,0.f} };
+                cubeVerts[28] = { { 1.f, 1.f, 1.f}, normalColor(0,1,0), {1.f,0.f} };
+                cubeVerts[29] = { { 1.f, 1.f,-1.f}, normalColor(0,1,0), {1.f,1.f} };
+
+                // Bottom (-Y)
+                cubeVerts[30] = { {-1.f,-1.f,-1.f}, normalColor(0,-1,0), {0.f,1.f} };
+                cubeVerts[31] = { {-1.f,-1.f, 1.f}, normalColor(0,-1,0), {0.f,0.f} };
+                cubeVerts[32] = { { 1.f,-1.f,-1.f}, normalColor(0,-1,0), {1.f,1.f} };
+                cubeVerts[33] = { {-1.f,-1.f, 1.f}, normalColor(0,-1,0), {0.f,0.f} };
+                cubeVerts[34] = { { 1.f,-1.f, 1.f}, normalColor(0,-1,0), {1.f,0.f} };
+                cubeVerts[35] = { { 1.f,-1.f,-1.f}, normalColor(0,-1,0), {1.f,1.f} };
+
+                Vertex planeVerts[G_PLANE_VERTICES];
+                for(int i=0;i<G_PLANE_VERTICES;++i) planeVerts[i].color = normalColor(0,1,0);
+                planeVerts[0].position = {-5.f,0.f,-5.f}; planeVerts[0].uv = {0.f,1.f};
+                planeVerts[1].position = {-5.f,0.f, 5.f}; planeVerts[1].uv = {0.f,0.f};
+                planeVerts[2].position = { 5.f,0.f,-5.f}; planeVerts[2].uv = {1.f,1.f};
+                planeVerts[3].position = {-5.f,0.f, 5.f}; planeVerts[3].uv = {0.f,0.f};
+                planeVerts[4].position = { 5.f,0.f, 5.f}; planeVerts[4].uv = {1.f,0.f};
+                planeVerts[5].position = { 5.f,0.f,-5.f}; planeVerts[5].uv = {1.f,1.f};
 
 
-
-		for (int i = 0; i < 3; i++) {
-			Vertex vertexData;
-			vertexData.color = { 0.0f,1.0f,0.0f,1.0f };
-
-			if (i == 0) {
-				vertexData.position = { -.5f,-.5f,0.0f };
-			}
-			else if (i == 1) {
-				vertexData.position = { 0.0f,.5f,0.0f };
-			}
-			else {
-				vertexData.position = { .5f,-.5f,0.0f };
-
-			}
-			vertices.push_back(vertexData);
-		}
-
-
-
-		memcpy(mDynamicVertexBuffer.GetCPUMemory(), vertecesBox, sizeof(Vertex) * G_BOX_VERTICES);
+                char* vbMem = reinterpret_cast<char*>(mDynamicVertexBuffer.GetCPUMemory());
+                memcpy(vbMem, cubeVerts, sizeof(Vertex) * G_CUBE_VERTICES);
+                memcpy(vbMem + sizeof(Vertex) * G_CUBE_VERTICES, planeVerts, sizeof(Vertex) * G_PLANE_VERTICES);
 
 		mDynamicVBView.BufferLocation = mDynamicVertexBuffer.Get()->GetGPUVirtualAddress();
 		mDynamicVBView.StrideInBytes = sizeof(Vertex);
@@ -201,12 +214,17 @@ namespace Engine {
 
 		mViewProjectionMatrix = viewMatrix * projectionMatrix;
 
-		mCBPassData.Initialize(mDevice.Get(), Utils::CalculateConstantbufferAlignment(sizeof(PassData)), D3D12_HEAP_TYPE_UPLOAD, D3D12_RESOURCE_STATE_GENERIC_READ);
-	}
+                mCBPassData.Initialize(mDevice.Get(), Utils::CalculateConstantbufferAlignment(sizeof(PassData)), D3D12_HEAP_TYPE_UPLOAD, D3D12_RESOURCE_STATE_GENERIC_READ);
 
-	void RenderAPI::UpdateDraw()
-	{
-		memcpy(mCBPassData.GetCPUMemory(), &mViewProjectionMatrix, sizeof(PassData));
+                mCubeWorldMatrix = DirectX::XMMatrixIdentity();
+        }
+
+        void RenderAPI::UpdateDraw()
+        {
+                PassData passData = {};
+                passData.viewproject = mViewProjectionMatrix;
+                passData.world = mCubeWorldMatrix;
+                memcpy(mCBPassData.GetCPUMemory(), &passData, sizeof(PassData));
 
 		//Set it to a render target state
 		D3D12_RESOURCE_BARRIER barrier = {};
@@ -238,16 +256,26 @@ namespace Engine {
 
 		mCommandList.GFXCmd()->IASetVertexBuffers(0, 1, &mDynamicVBView);
 
-		mCommandList.GFXCmd()->SetGraphicsRootConstantBufferView(0, mCBPassData.Get()->GetGPUVirtualAddress());
+                mCommandList.GFXCmd()->SetGraphicsRootConstantBufferView(0, mCBPassData.Get()->GetGPUVirtualAddress());
 
-		/*
+                ID3D12DescriptorHeap* heaps[] = { mTextureDescHeap.Get() };
+                mCommandList.GFXCmd()->SetDescriptorHeaps(1, heaps);
+                mCommandList.GFXCmd()->SetGraphicsRootDescriptorTable(1, mTextureDescHeap->GetGPUDescriptorHandleForHeapStart());
 
-		Do drawing stuff here
+                // Draw cube
+                mCommandList.GFXCmd()->DrawInstanced(G_CUBE_VERTICES, 1, 0, 0);
 
+                // Draw cube shadow
+                DirectX::XMVECTOR light = DirectX::XMVector3Normalize(DirectX::XMVectorSet(-1.f, -1.f, -1.f, 0.f));
+                DirectX::XMVECTOR plane = DirectX::XMVectorSet(0.f, 1.f, 0.f, 0.f);
+                passData.world = mCubeWorldMatrix * DirectX::XMMatrixShadow(plane, light);
+                memcpy(mCBPassData.GetCPUMemory(), &passData, sizeof(PassData));
+                mCommandList.GFXCmd()->DrawInstanced(G_CUBE_VERTICES, 1, 0, 0);
 
-		*/
-
-		mCommandList.GFXCmd()->DrawInstanced(G_BOX_VERTICES, 1, 0, 0);
+                // Draw plane
+                passData.world = DirectX::XMMatrixIdentity();
+                memcpy(mCBPassData.GetCPUMemory(), &passData, sizeof(PassData));
+                mCommandList.GFXCmd()->DrawInstanced(G_PLANE_VERTICES, 1, G_CUBE_VERTICES, 0);
 
 
 		//setting it back to the present state

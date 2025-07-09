@@ -23,14 +23,20 @@ namespace Engine {
 			break;
 		}
 
-		case WM_CREATE: {
+                case WM_CREATE: {
 
 			Application* pointer = reinterpret_cast<Application*>(GetWindowLongPtr(hwnd, GWLP_USERDATA));
 
 			pointer->OnCreate(hwnd);
 
-			break;
-		}
+                        break;
+                }
+
+               case WM_MOUSEMOVE: {
+                        Application* pointer = reinterpret_cast<Application*>(GetWindowLongPtr(hwnd, GWLP_USERDATA));
+                        pointer->OnMouseMove(wparam, LOWORD(lparam), HIWORD(lparam));
+                        break;
+                }
 
 		case WM_DESTROY: { //User pressed the Close/Exit Button
 			Application* pointer = reinterpret_cast<Application*>(GetWindowLongPtr(hwnd, GWLP_USERDATA));
@@ -87,12 +93,14 @@ namespace Engine {
 		return true;
 	}
 
-	void Application::OnCreate(HWND hwnd)
-	{
-		std::cout << "Created the actual window" << std::endl;
-		mRenderer.Initialize(hwnd, mWidth, mHeight);
+        void Application::OnCreate(HWND hwnd)
+        {
+                std::cout << "Created the actual window" << std::endl;
+                mRenderer.Initialize(hwnd, mWidth, mHeight);
+                mRenderer.SetCubeWorldMatrix(
+                        DirectX::XMMatrixTranslation(0.0f, 1.0f, 0.0f));
 
-	}
+        }
 
 	void Application::Update()
 	{
@@ -119,14 +127,31 @@ namespace Engine {
 		}
 	}
 
-	void Application::OnDestroy()
-	{
-		std::cout << "Closed the window \nshutting down the application" << std::endl;
+        void Application::OnDestroy()
+        {
+                std::cout << "Closed the window \nshutting down the application" << std::endl;
 
-		mRenderer.Release();
-		DXGIDebug::Get().GetLiveObjects();
+                mRenderer.Release();
+                DXGIDebug::Get().GetLiveObjects();
 
-		mIsRunning = false;
-	}
+                mIsRunning = false;
+        }
 
+        void Application::OnMouseMove(WPARAM state, int x, int y)
+        {
+                if (state & MK_LBUTTON)
+                {
+                        int dx = x - mLastMousePos.x;
+                        int dy = y - mLastMousePos.y;
+                        mRotX += dy * 0.01f;
+                        mRotY += dx * 0.01f;
+                        mRenderer.SetCubeWorldMatrix(
+                                DirectX::XMMatrixTranslation(0.0f, 1.0f, 0.0f) *
+                                DirectX::XMMatrixRotationX(mRotX) *
+                                DirectX::XMMatrixRotationY(mRotY));
+                }
+
+                mLastMousePos.x = x;
+                mLastMousePos.y = y;
+        }
 }
