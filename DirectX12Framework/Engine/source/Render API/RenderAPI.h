@@ -24,12 +24,14 @@ namespace Engine {
 		RenderAPI() = default;
 		~RenderAPI();
 
-		void Initialize(HWND hwnd, const UINT width, const UINT height);
+                void Initialize(HWND hwnd, const UINT width, const UINT height);
 
                 void UpdateDraw();
                 void SetCubeWorldMatrix(const DirectX::XMMATRIX& mtx) { mCubeWorldMatrix = mtx; }
 
-		void Release();
+                void LoadTextureFromFile(const wchar_t* path);
+
+                void Release();
 
 	private:
 

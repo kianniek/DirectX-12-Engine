@@ -13,6 +13,8 @@
 #include "DirectX12/Pipeline/D12RootSignature.h"
 
 #include "Utilities/Utilities.h"
+#include <wincodec.h>
+#pragma comment(lib, "windowscodecs.lib")
 
 namespace Engine {
 	using namespace Render;
@@ -305,9 +307,50 @@ namespace Engine {
 		}
 
 		//try to reset it
-		mCommandList.ResetCommandList();
+                mCommandList.ResetCommandList();
 
-	}
+        }
+
+        void RenderAPI::LoadTextureFromFile(const wchar_t* path)
+        {
+                CoInitializeEx(nullptr, COINIT_MULTITHREADED);
+
+                Microsoft::WRL::ComPtr<IWICImagingFactory> factory;
+                CoCreateInstance(CLSID_WICImagingFactory2, nullptr, CLSCTX_INPROC_SERVER,
+                                IID_PPV_ARGS(&factory));
+
+                Microsoft::WRL::ComPtr<IWICBitmapDecoder> decoder;
+                factory->CreateDecoderFromFilename(path, nullptr, GENERIC_READ,
+                        WICDecodeMetadataCacheOnLoad, &decoder);
+
+                Microsoft::WRL::ComPtr<IWICBitmapFrameDecode> frame;
+                decoder->GetFrame(0, &frame);
+
+                UINT width = 0, height = 0;
+                frame->GetSize(&width, &height);
+
+                Microsoft::WRL::ComPtr<IWICFormatConverter> converter;
+                factory->CreateFormatConverter(&converter);
+                converter->Initialize(frame.Get(), GUID_WICPixelFormat32bppRGBA,
+                        WICBitmapDitherTypeNone, nullptr, 0.0, WICBitmapPaletteTypeCustom);
+
+                std::vector<uint8_t> pixels(width * height * 4);
+                converter->CopyPixels(nullptr, width * 4, (UINT)pixels.size(), pixels.data());
+
+                mTexture.InitializeAsTexture2D(mDevice.Get(), width, height, DXGI_FORMAT_R8G8B8A8_UNORM,
+                        D3D12_HEAP_TYPE_UPLOAD, D3D12_RESOURCE_STATE_GENERIC_READ);
+
+                uint8_t* texMem = reinterpret_cast<uint8_t*>(mTexture.GetCPUMemory());
+                memcpy(texMem, pixels.data(), pixels.size());
+
+                D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc = {};
+                srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+                srvDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+                srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
+                srvDesc.Texture2D.MipLevels = 1;
+                mDevice->CreateShaderResourceView(mTexture.Get(), &srvDesc,
+                        mTextureDescHeap->GetCPUDescriptorHandleForHeapStart());
+        }
 
 	void RenderAPI::Release()
 	{

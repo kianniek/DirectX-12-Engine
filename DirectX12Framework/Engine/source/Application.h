@@ -23,6 +23,8 @@ namespace Engine {
 
                 void OnMouseMove(WPARAM state, int x, int y);
 
+                void LoadTexture(const wchar_t* path) { mRenderer.LoadTextureFromFile(path); }
+
 		inline bool IsRunning() { return mIsRunning; } //return flag
 
 
