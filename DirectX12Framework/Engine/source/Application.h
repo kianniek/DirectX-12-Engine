@@ -28,9 +28,13 @@ namespace Engine {
 		
 		RenderAPI mRenderer;
 
-	private: //Variables
-		HWND mWindowHandle = nullptr;
-		bool mIsRunning = false; //flag to check if the application is running 
+        private: //Variables
+                HWND mWindowHandle = nullptr;
+                bool mIsRunning = false; //flag to check if the application is running
+
+                POINT mLastMousePos{0,0};
+                float mRotX = 0.0f;
+                float mRotY = 0.0f;
 
 	private:
 		UINT mWidth = 960;

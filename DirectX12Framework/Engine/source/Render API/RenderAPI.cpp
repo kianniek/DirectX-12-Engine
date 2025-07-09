@@ -51,59 +51,87 @@ namespace Engine {
 
 		mSwapChain.Initialize(mDevice.Get(), factory.Get(), mCommandQueue.Get(), hwnd, mWidth, mHeight);
 
-		mDynamicVertexBuffer.Initialize(mDevice.Get(), KBs(16), D3D12_HEAP_TYPE_UPLOAD, D3D12_RESOURCE_STATE_GENERIC_READ);
-		mDynamicVertexBuffer.Get()->SetName(L"Dynamic vertex buffer");
+               mDynamicVertexBuffer.Initialize(mDevice.Get(), KBs(16), D3D12_HEAP_TYPE_UPLOAD, D3D12_RESOURCE_STATE_GENERIC_READ);
+               mDynamicVertexBuffer.Get()->SetName(L"Dynamic vertex buffer");
+
+                mTextureDescHeap.InitializeSRVHeap(mDevice.Get());
+                {
+                        D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc = {};
+                        srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+                        srvDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+                        srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
+                        srvDesc.Texture2D.MipLevels = 1;
+                        mDevice->CreateShaderResourceView(nullptr, &srvDesc, mTextureDescHeap->GetCPUDescriptorHandleForHeapStart());
+                }
 
 		std::vector<Vertex> vertices;
 
 #define G_BOX_VERTICES 18
 
-		Vertex vertecesBox[G_BOX_VERTICES];
+                Vertex vertecesBox[G_BOX_VERTICES];
 
 		// Front face
-		vertecesBox[0].position = { -1.0f, -1.0f, -1.0f };
-		vertecesBox[0].color = { 0.0f, 1.0f, 0.0f, 1.0f };
-		vertecesBox[1].position = { -1.0f, 1.0f, -1.0f };
-		vertecesBox[1].color = { 0.0f, 1.0f, 0.0f, 1.0f };
-		vertecesBox[2].position = { 1.0f, -1.0f, -1.0f };
-		vertecesBox[2].color = { 0.0f, 1.0f, 0.0f, 1.0f };
+                vertecesBox[0].position = { -1.0f, -1.0f, -1.0f };
+                vertecesBox[0].color = { 0.0f, 1.0f, 0.0f, 1.0f };
+                vertecesBox[0].uv = {0.0f, 1.0f};
+                vertecesBox[1].position = { -1.0f, 1.0f, -1.0f };
+                vertecesBox[1].color = { 0.0f, 1.0f, 0.0f, 1.0f };
+                vertecesBox[1].uv = {0.0f, 0.0f};
+                vertecesBox[2].position = { 1.0f, -1.0f, -1.0f };
+                vertecesBox[2].color = { 0.0f, 1.0f, 0.0f, 1.0f };
+                vertecesBox[2].uv = {1.0f, 1.0f};
 
-		vertecesBox[3].position = { -1.0f, 1.0f, -1.0f };
-		vertecesBox[3].color = { 0.0f, 1.0f, 0.0f, 1.0f };
-		vertecesBox[4].position = { 1.0f, 1.0f, -1.0f };
-		vertecesBox[4].color = { 0.0f, 1.0f, 0.0f, 1.0f };
-		vertecesBox[5].position = { 1.0f, -1.0f, -1.0f };
-		vertecesBox[5].color = { 0.0f, 1.0f, 0.0f, 1.0f };
+                vertecesBox[3].position = { -1.0f, 1.0f, -1.0f };
+                vertecesBox[3].color = { 0.0f, 1.0f, 0.0f, 1.0f };
+                vertecesBox[3].uv = {0.0f, 0.0f};
+                vertecesBox[4].position = { 1.0f, 1.0f, -1.0f };
+                vertecesBox[4].color = { 0.0f, 1.0f, 0.0f, 1.0f };
+                vertecesBox[4].uv = {1.0f, 0.0f};
+                vertecesBox[5].position = { 1.0f, -1.0f, -1.0f };
+                vertecesBox[5].color = { 0.0f, 1.0f, 0.0f, 1.0f };
+                vertecesBox[5].uv = {1.0f, 1.0f};
 
 		// Back face
-		vertecesBox[6].position = { -1.0f, -1.0f, 1.0f };
-		vertecesBox[6].color = { 1.0f, 0.0f, 0.0f, 1.0f };
-		vertecesBox[7].position = { -1.0f, 1.0f, 1.0f };
-		vertecesBox[7].color = { 1.0f, 1.0f, 0.0f, 1.0f };
-		vertecesBox[8].position = { 1.0f, -1.0f, 1.0f };
-		vertecesBox[8].color = { 1.0f, 0.0f, 0.0f, 1.0f };
+                vertecesBox[6].position = { -1.0f, -1.0f, 1.0f };
+                vertecesBox[6].color = { 1.0f, 0.0f, 0.0f, 1.0f };
+                vertecesBox[6].uv = {0.0f, 1.0f};
+                vertecesBox[7].position = { -1.0f, 1.0f, 1.0f };
+                vertecesBox[7].color = { 1.0f, 1.0f, 0.0f, 1.0f };
+                vertecesBox[7].uv = {0.0f, 0.0f};
+                vertecesBox[8].position = { 1.0f, -1.0f, 1.0f };
+                vertecesBox[8].color = { 1.0f, 0.0f, 0.0f, 1.0f };
+                vertecesBox[8].uv = {1.0f, 1.0f};
 
-		vertecesBox[9].position = { -1.0f, 1.0f, 1.0f };
-		vertecesBox[9].color = { 1.0f, 0.0f, 0.0f, 1.0f };
-		vertecesBox[10].position = { 1.0f, 1.0f, 1.0f };
-		vertecesBox[10].color = { 1.0f, 0.0f, 0.0f, 1.0f };
-		vertecesBox[11].position = { 1.0f, -1.0f, 1.0f };
-		vertecesBox[11].color = { 1.0f, 0.0f, 0.0f, 1.0f };
+                vertecesBox[9].position = { -1.0f, 1.0f, 1.0f };
+                vertecesBox[9].color = { 1.0f, 0.0f, 0.0f, 1.0f };
+                vertecesBox[9].uv = {0.0f, 0.0f};
+                vertecesBox[10].position = { 1.0f, 1.0f, 1.0f };
+                vertecesBox[10].color = { 1.0f, 0.0f, 0.0f, 1.0f };
+                vertecesBox[10].uv = {1.0f, 0.0f};
+                vertecesBox[11].position = { 1.0f, -1.0f, 1.0f };
+                vertecesBox[11].color = { 1.0f, 0.0f, 0.0f, 1.0f };
+                vertecesBox[11].uv = {1.0f, 1.0f};
 
 		// Side face
-		vertecesBox[12].position = { -1.0f, -1.0f, 1.0f };
-		vertecesBox[12].color = { 0.0f, 0.0f, 1.0f, 1.0f };
-		vertecesBox[13].position = { -1.0f, 1.0f, 1.0f };
-		vertecesBox[13].color = { 0.0f, 0.0f, 1.0f, 1.0f };
-		vertecesBox[14].position = { -1.0f, -1.0f, -1.0f };
-		vertecesBox[14].color = { 0.0f, 0.0f, 1.0f, 1.0f };
+                vertecesBox[12].position = { -1.0f, -1.0f, 1.0f };
+                vertecesBox[12].color = { 0.0f, 0.0f, 1.0f, 1.0f };
+                vertecesBox[12].uv = {0.0f, 1.0f};
+                vertecesBox[13].position = { -1.0f, 1.0f, 1.0f };
+                vertecesBox[13].color = { 0.0f, 0.0f, 1.0f, 1.0f };
+                vertecesBox[13].uv = {0.0f, 0.0f};
+                vertecesBox[14].position = { -1.0f, -1.0f, -1.0f };
+                vertecesBox[14].color = { 0.0f, 0.0f, 1.0f, 1.0f };
+                vertecesBox[14].uv = {1.0f, 1.0f};
 
-		vertecesBox[15].position = { -1.0f, 1.0f, 1.0f };
-		vertecesBox[15].color = { 0.0f, 0.0f, 1.0f, 1.0f };
-		vertecesBox[16].position = { -1.0f, 1.0f, -1.0f };
-		vertecesBox[16].color = { 0.0f, 0.0f, 1.0f, 1.0f };
-		vertecesBox[17].position = { -1.0f, -1.0f, -1.0f };
-		vertecesBox[17].color = { 0.0f, 0.0f, 1.0f, 1.0f };
+                vertecesBox[15].position = { -1.0f, 1.0f, 1.0f };
+                vertecesBox[15].color = { 0.0f, 0.0f, 1.0f, 1.0f };
+                vertecesBox[15].uv = {0.0f, 0.0f};
+                vertecesBox[16].position = { -1.0f, 1.0f, -1.0f };
+                vertecesBox[16].color = { 0.0f, 0.0f, 1.0f, 1.0f };
+                vertecesBox[16].uv = {1.0f, 0.0f};
+                vertecesBox[17].position = { -1.0f, -1.0f, -1.0f };
+                vertecesBox[17].color = { 0.0f, 0.0f, 1.0f, 1.0f };
+                vertecesBox[17].uv = {1.0f, 1.0f};
 
 
 
@@ -201,12 +229,17 @@ namespace Engine {
 
 		mViewProjectionMatrix = viewMatrix * projectionMatrix;
 
-		mCBPassData.Initialize(mDevice.Get(), Utils::CalculateConstantbufferAlignment(sizeof(PassData)), D3D12_HEAP_TYPE_UPLOAD, D3D12_RESOURCE_STATE_GENERIC_READ);
-	}
+                mCBPassData.Initialize(mDevice.Get(), Utils::CalculateConstantbufferAlignment(sizeof(PassData)), D3D12_HEAP_TYPE_UPLOAD, D3D12_RESOURCE_STATE_GENERIC_READ);
 
-	void RenderAPI::UpdateDraw()
-	{
-		memcpy(mCBPassData.GetCPUMemory(), &mViewProjectionMatrix, sizeof(PassData));
+                mCubeWorldMatrix = DirectX::XMMatrixIdentity();
+        }
+
+        void RenderAPI::UpdateDraw()
+        {
+                PassData passData = {};
+                passData.viewproject = mViewProjectionMatrix;
+                passData.world = mCubeWorldMatrix;
+                memcpy(mCBPassData.GetCPUMemory(), &passData, sizeof(PassData));
 
 		//Set it to a render target state
 		D3D12_RESOURCE_BARRIER barrier = {};
@@ -238,7 +271,11 @@ namespace Engine {
 
 		mCommandList.GFXCmd()->IASetVertexBuffers(0, 1, &mDynamicVBView);
 
-		mCommandList.GFXCmd()->SetGraphicsRootConstantBufferView(0, mCBPassData.Get()->GetGPUVirtualAddress());
+                mCommandList.GFXCmd()->SetGraphicsRootConstantBufferView(0, mCBPassData.Get()->GetGPUVirtualAddress());
+
+                ID3D12DescriptorHeap* heaps[] = { mTextureDescHeap.Get() };
+                mCommandList.GFXCmd()->SetDescriptorHeaps(1, heaps);
+                mCommandList.GFXCmd()->SetGraphicsRootDescriptorTable(1, mTextureDescHeap->GetGPUDescriptorHandleForHeapStart());
 
 		/*
 
