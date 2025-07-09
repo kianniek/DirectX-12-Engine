@@ -23,14 +23,37 @@ namespace Engine {
 			break;
 		}
 
-		case WM_CREATE: {
+                case WM_CREATE: {
 
 			Application* pointer = reinterpret_cast<Application*>(GetWindowLongPtr(hwnd, GWLP_USERDATA));
 
 			pointer->OnCreate(hwnd);
 
-			break;
-		}
+                        break;
+                }
+
+                case WM_MOUSEMOVE: {
+                        Application* pointer = reinterpret_cast<Application*>(GetWindowLongPtr(hwnd, GWLP_USERDATA));
+                        if (wparam & MK_LBUTTON)
+                        {
+                                int x = LOWORD(lparam);
+                                int y = HIWORD(lparam);
+                                int dx = x - pointer->mLastMousePos.x;
+                                int dy = y - pointer->mLastMousePos.y;
+                                pointer->mRotX += dy * 0.01f;
+                                pointer->mRotY += dx * 0.01f;
+                                pointer->mRenderer.SetCubeWorldMatrix(
+                                        DirectX::XMMatrixRotationX(pointer->mRotX) *
+                                        DirectX::XMMatrixRotationY(pointer->mRotY));
+                                pointer->mLastMousePos = { x, y };
+                        }
+                        else
+                        {
+                                pointer->mLastMousePos.x = LOWORD(lparam);
+                                pointer->mLastMousePos.y = HIWORD(lparam);
+                        }
+                        break;
+                }
 
 		case WM_DESTROY: { //User pressed the Close/Exit Button
 			Application* pointer = reinterpret_cast<Application*>(GetWindowLongPtr(hwnd, GWLP_USERDATA));
@@ -87,12 +110,13 @@ namespace Engine {
 		return true;
 	}
 
-	void Application::OnCreate(HWND hwnd)
-	{
-		std::cout << "Created the actual window" << std::endl;
-		mRenderer.Initialize(hwnd, mWidth, mHeight);
+        void Application::OnCreate(HWND hwnd)
+        {
+                std::cout << "Created the actual window" << std::endl;
+                mRenderer.Initialize(hwnd, mWidth, mHeight);
+                mRenderer.SetCubeWorldMatrix(DirectX::XMMatrixIdentity());
 
-	}
+        }
 
 	void Application::Update()
 	{
