@@ -8,8 +8,8 @@ namespace Engine
 		Release();
 	}
 
-	void D12Resource::Initialize(ID3D12Device* pDevice, const unsigned int numBytes, D3D12_HEAP_TYPE heapType,
-	                             D3D12_RESOURCE_STATES initialState)
+        void D12Resource::Initialize(ID3D12Device* pDevice, const unsigned int numBytes, D3D12_HEAP_TYPE heapType,
+                                     D3D12_RESOURCE_STATES initialState)
 	{
 		D3D12_HEAP_PROPERTIES heapProp = {};
 		heapProp.Type = heapType;
@@ -30,8 +30,33 @@ namespace Engine
 		resourceDesc.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
 		resourceDesc.Flags = D3D12_RESOURCE_FLAG_NONE;
 
-		KOSMO_EVAL_HR(pDevice->CreateCommittedResource(&heapProp, D3D12_HEAP_FLAG_NONE, &resourceDesc, initialState, 0, IID_PPV_ARGS(GetAddressOf())), "Error creating a resource");
-	}
+                KOSMO_EVAL_HR(pDevice->CreateCommittedResource(&heapProp, D3D12_HEAP_FLAG_NONE, &resourceDesc, initialState, 0, IID_PPV_ARGS(GetAddressOf())), "Error creating a resource");
+        }
+
+        void D12Resource::InitializeAsTexture2D(ID3D12Device* pDevice, unsigned int width, unsigned int height,
+                DXGI_FORMAT format, D3D12_HEAP_TYPE heapType, D3D12_RESOURCE_STATES initialState)
+        {
+                D3D12_HEAP_PROPERTIES heapProp = {};
+                heapProp.Type = heapType;
+                heapProp.CPUPageProperty = D3D12_CPU_PAGE_PROPERTY_UNKNOWN;
+                heapProp.MemoryPoolPreference = D3D12_MEMORY_POOL_UNKNOWN;
+                heapProp.CreationNodeMask = 0;
+                heapProp.VisibleNodeMask = 0;
+
+                D3D12_RESOURCE_DESC desc = {};
+                desc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
+                desc.Alignment = 0;
+                desc.Width = width;
+                desc.Height = height;
+                desc.DepthOrArraySize = 1;
+                desc.MipLevels = 1;
+                desc.Format = format;
+                desc.SampleDesc = { 1,0 };
+                desc.Layout = (heapType == D3D12_HEAP_TYPE_UPLOAD) ? D3D12_TEXTURE_LAYOUT_ROW_MAJOR : D3D12_TEXTURE_LAYOUT_UNKNOWN;
+                desc.Flags = D3D12_RESOURCE_FLAG_NONE;
+
+                KOSMO_EVAL_HR(pDevice->CreateCommittedResource(&heapProp, D3D12_HEAP_FLAG_NONE, &desc, initialState, nullptr, IID_PPV_ARGS(GetAddressOf())), "Error creating texture");
+        }
 
 	void D12Resource::InitializeAsDepthBuffer(ID3D12Device* pDevice, const unsigned int width,
 		const unsigned int height)

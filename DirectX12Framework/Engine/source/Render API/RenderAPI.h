@@ -24,11 +24,14 @@ namespace Engine {
 		RenderAPI() = default;
 		~RenderAPI();
 
-		void Initialize(HWND hwnd, const UINT width, const UINT height);
+                void Initialize(HWND hwnd, const UINT width, const UINT height);
 
-		void UpdateDraw();
+                void UpdateDraw();
+                void SetCubeWorldMatrix(const DirectX::XMMATRIX& mtx) { mCubeWorldMatrix = mtx; }
 
-		void Release();
+                void LoadTextureFromFile(const wchar_t* path);
+
+                void Release();
 
 	private:
 
@@ -44,12 +47,18 @@ namespace Engine {
 		D3D12_VIEWPORT mViewport;
 		D3D12_RECT mSRRect;
 
-		D12DescriptorHeap mDepthDescHeap;
+                D12DescriptorHeap mDepthDescHeap;
+                D12DescriptorHeap mTextureDescHeap;
 
-		D12Resource mDynamicVertexBuffer;
-		D3D12_VERTEX_BUFFER_VIEW mDynamicVBView;
+                D12Resource mDynamicVertexBuffer;
+                D3D12_VERTEX_BUFFER_VIEW mDynamicVBView;
 
-		D12Resource mCBPassData;
+                D12Resource mTexture;
+                D3D12_CPU_DESCRIPTOR_HANDLE mTextureCPUHandle{};
+
+                D12Resource mCBPassData;
+
+                DirectX::XMMATRIX mCubeWorldMatrix = DirectX::XMMatrixIdentity();
 
 	
 
